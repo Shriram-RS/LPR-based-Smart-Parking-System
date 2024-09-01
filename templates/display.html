@@ -1,0 +1,19 @@
+<!-- templates/display.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Plate Detection</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .plate { font-size: 2em; color: #333; margin: 20px 0; }
+        .status { font-size: 1.5em; color: #ff0000; }
+    </style>
+</head>
+<body>
+    <h1>Detected Number Plate</h1>
+    <div class="plate">{{ number_plate }}</div>
+    <div class="status">{{ status }}</div>
+</body>
+</html>

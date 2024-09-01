@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Status</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: rgb(229, 217, 217);
+            margin: 0;
+        }
+        .container-flex {
+            flex: 1;
+        }
+        .parking-lot {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+        .parking-space {
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .parking-space.occupied {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .parking-space.vacant {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .vehicle-info {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .status {
+            font-size: 1rem;
+        }
+        header, footer {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+        }
+        footer {
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h2>Smart Parking Management System</h2>
+        </div>
+    </header>
+    
+    <div class="container-flex container">
+        <h1 class="text-center my-4">Parking Lot Status</h1>
+        <div class="parking-lot">
+            <div id="slot1" class="parking-space vacant">
+                <div id="icon1" class="icon">&#128663;</div>
+                <div id="number_plate1" class="vehicle-info">No Vehicle</div>
+                <div id="status1" class="status">Vacant</div>
+            </div>
+            <div id="slot2" class="parking-space vacant">
+                <div id="icon2" class="icon">&#128663;</div>
+                <div id="number_plate2" class="vehicle-info">No Vehicle</div>
+                <div id="status2" class="status">Vacant</div>
+            </div>
+            <div id="slot3" class="parking-space vacant">
+                <div id="icon3" class="icon">&#128663;</div>
+                <div id="number_plate3" class="vehicle-info">No Vehicle</div>
+                <div id="status3" class="status">Vacant</div>
+            </div>
+            <div id="slot4" class="parking-space vacant">
+                <div id="icon4" class="icon">&#128663;</div>
+                <div id="number_plate4" class="vehicle-info">No Vehicle</div>
+                <div id="status4" class="status">Vacant</div>
+            </div>
+            <div id="slot5" class="parking-space vacant">
+                <div id="icon5" class="icon">&#128663;</div>
+                <div id="number_plate5" class="vehicle-info">No Vehicle</div>
+                <div id="status5" class="status">Vacant</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Smart Parking Management System | All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        let cameraTriggered = { "slot1": false, "slot2": false, "slot3": false, "slot4": false, "slot5": false };
+
+        function captureNumberPlate(slot) {
+            $.ajax({
+                url: '/capture_number_plate',
+                method: 'POST',
+                data: { "slot": slot },
+                success: function(data) {
+                    $('#number_plate' + slot).text(data.number_plate);
+                    $('#slot' + slot).removeClass('vacant').addClass('occupied');
+                    $('#icon' + slot).html('&#128664;'); // Car parked icon
+                    $('#status' + slot).text('Occupied');
+                },
+                error: function() {
+                    console.error('Error capturing number plate for slot ' + slot);
+                }
+            });
+        }
+
+        function fetchStatus() {
+            $.ajax({
+                url: '/get_sensor_status',
+                method: 'GET',
+                success: function(data) {
+                    for (let i = 1; i <= 5; i++) {
+                        let sensor = 'sensor' + i;
+                        let slot = 'slot' + i;
+                        if (data[sensor] === "Parked" && !cameraTriggered[slot]) {
+                            captureNumberPlate(i);
+                            cameraTriggered[slot] = true;
+                        } else if (data[sensor] === "Not Parked") {
+                            cameraTriggered[slot] = false;
+                            $('#number_plate' + i).text("No Vehicle");
+                            $('#slot' + i).removeClass('occupied').addClass('vacant');
+                            $('#icon' + i).html('&#128663;'); // Car vacant icon
+                            $('#status' + i).text('Vacant');
+                        }
+                    }
+                },
+                error: function() {
+                    console.error('Error fetching sensor status.');
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            fetchStatus(); // Initial fetch
+            setInterval(fetchStatus, 1000); // Update every second
+        });
+    </script>
+</body>
+</html>

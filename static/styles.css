@@ -1,0 +1,30 @@
+
+body{
+    background-color: lightblue;
+}
+.parking-layout {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    width: 600px; /* Set the desired width of the parking layout */
+    height: 400px; /* Set the desired height of the parking layout */
+    margin-left: 550px;
+}
+
+.parking-space {
+    position: absolute;
+    background-color: #ddd;
+    border: 1px solid #999;
+    font-weight: bold;
+    font-size: 18px;
+    color: lime;
+    width: 120px; /* Set the desired width of parking spaces */
+    height: 60px; /* Set the desired height of parking spaces */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
